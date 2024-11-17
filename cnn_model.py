@@ -41,6 +41,9 @@ epochs = 4
 batch_size = 32
 learning_rate = 0.001
 
+#Initialize the train and test data
+train_data = pd.read_csv(os.path.join(data_path, 'train-metadata.csv'))
+test_data = pd.read_csv(os.path.join(data_path, 'test-metadata.csv'))
 
 
 
