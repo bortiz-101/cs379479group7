@@ -45,6 +45,12 @@ learning_rate = 0.001
 train_data = pd.read_csv(os.path.join(data_path, 'train-metadata.csv'))
 test_data = pd.read_csv(os.path.join(data_path, 'test-metadata.csv'))
 
+train_data.fillna(train_data.median(numeric_only=True), inplace=True)
+train_data.fillna(train_data.mode().iloc[0], inplace=True)
+test_data.fillna(test_data.median(numeric_only=True), inplace=True)
+test_data.fillna(test_data.mode().iloc[0], inplace=True)
+
+
 
 
 
