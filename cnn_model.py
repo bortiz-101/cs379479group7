@@ -55,6 +55,12 @@ test_data.fillna(test_data.mode().iloc[0], inplace=True)
 train_data = pd.get_dummies(train_data, columns=['sex', 'anatom_site_general'], drop_first=True)
 test_data = pd.get_dummies(test_data, columns=['sex', 'anatom_site_general'], drop_first=True)
 
+# TODO Add columns that are irrelevant to the cnn here, if all are needed, resolve.
+X = train_data.drop(columns=['target'])
+y = train_data['target']
+
+# Stratified split of training and test set
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
 
 
