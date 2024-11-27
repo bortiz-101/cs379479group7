@@ -190,7 +190,15 @@ test_df = pd.read_csv(test_path)
 test_h5 = root / 'test-image.hdf5'
 
 # Set up device and random seed
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#MacOS GPU Support
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+#NVIDIA Support
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+#No GPU
+else:
+    device=torch.device("cpu")
 print(f"Using device: {device}")
 
 if torch.cuda.is_available():

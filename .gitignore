@@ -162,5 +162,9 @@ cython_debug/
 #.idea/
 data/*
 !data/.gitkeep
-.idea
+.idea/*
 .DS_Store
+
+#Data if present should not pushed to source control
+data/
+isic-2024-challenge/

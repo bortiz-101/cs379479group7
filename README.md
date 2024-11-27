@@ -20,27 +20,27 @@ https://www.kaggle.com/competitions/isic-2024-challenge
     ````bash
    pip3 install -r requirments.txt
 
-3. Set enviromental variables
-   #### Windows (Powershell)
-   ```bash
-   [Environment]::SetEnvironmentVariable('CWD', (Get-Location).Path, 'Process')
-   [Environment]::SetEnvironmentVariable('TRAIN_CSV', "$CWD\isic-2024-challenge\train-metadata.csv", 'Process')
-   [Environment]::SetEnvironmentVariable('TEST_CSV', "$CWD\isic-2024-challenge\test-metadata.csv", 'Process')
-   [Environment]::SetEnvironmentVariable('TRAIN_HDF5', "$CWD\isic-2024-challenge\train-image.hdf5", 'Process')
-   [Environment]::SetEnvironmentVariable('TEST_HDF5', "$CWD\isic-2024-challenge\dev-image.hdf5", 'Process')
-   ````
+3. Set enviromental variables (update Data Path)
+      #### Windows (Powershell)
+      ```bash
+      [Environment]::SetEnvironmentVariable('DATA', <INSERT_DATA_PATH>, 'Process')
+      [Environment]::SetEnvironmentVariable('TRAIN_CSV', "$DATA\isic-2024-challenge\train-metadata.csv", 'Process')
+      [Environment]::SetEnvironmentVariable('TEST_CSV', "$DATA\isic-2024-challenge\test-metadata.csv", 'Process')
+      [Environment]::SetEnvironmentVariable('TRAIN_HDF5', "$DATA\isic-2024-challenge\train-image.hdf5", 'Process')
+      [Environment]::SetEnvironmentVariable('TEST_HDF5', "$DATA\isic-2024-challenge\dev-image.hdf5", 'Process')
+      ````
 
-   #### Linux/MacOS
-   ```bash
-   cat << 'EOF' > environment.config
-   $CWD=\$(pwd)
-   TRAIN_CSV=\${CWD}/isic-2024-challenge/train-metadata.csv
-   TEST_CSV=\${CWD}/isic-2024-challenge/test-metadata.csv
-   TRAIN_HDF5=\${CWD}/isic-2024-challenge/train-image.hdf5
-   TEST_HDF5=\${CWD}/isic-2024-challenge/test-image.hdf5
-   EOF
-   source environment.config
-   ```
+      #### Linux/MacOS
+      ```bash
+      cat << 'EOF' > environment.config
+      $DATA=<INSERT_DATA_PATH>
+      TRAIN_CSV=\${DATA}/isic-2024-challenge/train-metadata.csv
+      TEST_CSV=\${DATA}/isic-2024-challenge/test-metadata.csv
+      TRAIN_HDF5=\${DATA}/isic-2024-challenge/train-image.hdf5
+      TEST_HDF5=\${DATA}/isic-2024-challenge/test-image.hdf5
+      EOF
+      source environment.config
+      ```
 
 
 3. Run the script
