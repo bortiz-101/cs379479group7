@@ -19,6 +19,13 @@ import io
 from albumentations.pytorch import ToTensorV2
 
 
+# Load environmental variables
+DATA = os.environ.get("DATA")
+TRAIN_CSV = os.environ.get("TRAIN_CSV")
+TEST_CSV = os.environ.get("TEST_CSV")
+TRAIN_HDF5 = os.environ.get("TRAIN_HDF5")
+TEST_HDF5 = os.environ.get("TEST_HDF5")
+
 # Set up device and random seed
 
 #MacOS GPU Support
@@ -60,7 +67,7 @@ quick_train_record_count = 50000   #need to get at least some positive cases eve
 ## Load meta data and split folds
 
 
-df_train = pd.read_csv("")
+df_train = pd.read_csv(TRAIN_CSV)
 
 num_folds = 5
 
@@ -80,15 +87,11 @@ for fold, count in fold_summary.items():
         print(f"Fold {fold}: {count} patients")
 print(f"Total patients: {total_patients}")
 
-##Load Meta-Data/Review
-
-# Set the HDF5 file path
-TRAIN_HDF5_FILE_PATH = '/kaggle/input/isic-2024-challenge/train-image.hdf5'
 
 # are we scoring?
 scoring = False
 #check length of test data to see if we are scoring....
-test_length = len(pd.read_csv("/kaggle/input/isic-2024-challenge/test-metadata.csv"))
+test_length = len(pd.read_csv("TEST_CSV"))
 if test_length > 3:
     scoring = True
 
@@ -260,7 +263,7 @@ def visualize_augmentations_positive(dataset, num_samples=3, num_augmentations=5
     plt.show()
 
 augtest_dataset = ISICDataset(
-    hdf5_file=TRAIN_HDF5_FILE_PATH,
+    hdf5_file= TRAIN_HDF5,
     isic_ids=df_train['isic_id'].values,
     targets=df_train['target'].values,
     transform=aug_transform,
@@ -390,7 +393,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Perform cross-validation training
-all_val_targets, all_val_outputs = cross_validation_train(df_train_balanced, num_folds, num_epochs, TRAIN_HDF5_FILE_PATH, aug_transform, base_transform, device)
+all_val_targets, all_val_outputs = cross_validation_train(df_train_balanced, num_folds, num_epochs, TRAIN_HDF5, aug_transform, base_transform, device)
 
 #%%
 # Final overall evaluation
@@ -507,7 +510,7 @@ if not scoring:
     folds = [0, 1, 2, 3, 4]
 
     # Generate out-of-fold predictions
-    oof_predictions, model_filenames = generate_oof_predictions(df_train, folds, TRAIN_HDF5_FILE_PATH, base_transform)
+    oof_predictions, model_filenames = generate_oof_predictions(df_train, folds, TRAIN_HDF5, base_transform)
 
     # Create DataFrame for OOF predictions
     oof_df = pd.DataFrame({
@@ -525,8 +528,8 @@ if not scoring:
 
 # Predict for test
 
-df_test = pd.read_csv("/kaggle/input/isic-2024-challenge/test-metadata.csv")
-TEST_HDF5_FILE_PATH = '/kaggle/input/isic-2024-challenge/test-image.hdf5'
+df_test = pd.read_csv(TEST_CSV)
+TEST_HDF5_FILE_PATH = TEST_HDF5
 
 # Set up CUDA if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -539,7 +542,7 @@ models = load_models(folds, device)
 
 # Prepare your test dataset
 test_dataset = ISICDataset(
-    hdf5_file=TEST_HDF5_FILE_PATH,
+    hdf5_file=TEST_HDF5,
     isic_ids=df_test['isic_id'].values,
     transform=base_transform,
 )
