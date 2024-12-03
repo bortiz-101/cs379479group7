@@ -23,11 +23,11 @@ https://www.kaggle.com/competitions/isic-2024-challenge
 3. Set enviromental variables (update Data Path)
       #### Windows (Powershell)
       ```bash
-      [Environment]::SetEnvironmentVariable('DATA', <INSERT_DATA_PATH>, 'Process')
-      [Environment]::SetEnvironmentVariable('TRAIN_CSV', "$DATA\isic-2024-challenge\train-metadata.csv", 'Process')
-      [Environment]::SetEnvironmentVariable('TEST_CSV', "$DATA\isic-2024-challenge\test-metadata.csv", 'Process')
-      [Environment]::SetEnvironmentVariable('TRAIN_HDF5', "$DATA\isic-2024-challenge\train-image.hdf5", 'Process')
-      [Environment]::SetEnvironmentVariable('TEST_HDF5', "$DATA\isic-2024-challenge\dev-image.hdf5", 'Process')
+      [Environment]::SetEnvironmentVariable('DATA', 'C:\temp', 'Process')
+      [Environment]::SetEnvironmentVariable('TRAIN_CSV', "$($env:DATA)\isic-2024-challenge\train-metadata.csv", 'Process')
+      [Environment]::SetEnvironmentVariable('TEST_CSV', "$($env:DATA)\isic-2024-challenge\test-metadata.csv", 'Process')
+      [Environment]::SetEnvironmentVariable('TRAIN_HDF5', "$($env:DATA)\isic-2024-challenge\train-image.hdf5", 'Process')
+      [Environment]::SetEnvironmentVariable('TEST_HDF5', "$($env:DATA)\isic-2024-challenge\dev-image.hdf5", 'Process')
       ````
 
       #### Linux/MacOS

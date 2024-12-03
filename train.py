@@ -91,7 +91,7 @@ print(f"Total patients: {total_patients}")
 # are we scoring?
 scoring = False
 #check length of test data to see if we are scoring....
-test_length = len(pd.read_csv("TEST_CSV"))
+test_length = len(pd.read_csv(TEST_CSV))
 if test_length > 3:
     scoring = True
 
