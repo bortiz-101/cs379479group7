@@ -28,6 +28,7 @@ https://www.kaggle.com/competitions/isic-2024-challenge
       [Environment]::SetEnvironmentVariable('TEST_CSV', "$($env:DATA)\isic-2024-challenge\test-metadata.csv", 'Process')
       [Environment]::SetEnvironmentVariable('TRAIN_HDF5', "$($env:DATA)\isic-2024-challenge\train-image.hdf5", 'Process')
       [Environment]::SetEnvironmentVariable('TEST_HDF5', "$($env:DATA)\isic-2024-challenge\dev-image.hdf5", 'Process')
+      [Environment]::SetEnvironmentVariable('PRETRAINED_MODEL', "$($env:DATA)\tf_efficientnetv2_b1-be6e41b0.pth", 'Process')
       ````
 
       #### Linux/MacOS
@@ -38,6 +39,7 @@ https://www.kaggle.com/competitions/isic-2024-challenge
       TEST_CSV=\${DATA}/isic-2024-challenge/test-metadata.csv
       TRAIN_HDF5=\${DATA}/isic-2024-challenge/train-image.hdf5
       TEST_HDF5=\${DATA}/isic-2024-challenge/test-image.hdf5
+      PRETRAINED_MODEL=\${DATA}/tf_efficientnetv2_b1-be6e41b0.pth
       EOF
       source environment.config
       ```

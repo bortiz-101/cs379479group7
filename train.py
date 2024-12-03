@@ -18,13 +18,13 @@ from PIL import Image
 import io
 from albumentations.pytorch import ToTensorV2
 
-
 # Load environmental variables
 DATA = os.environ.get("DATA")
 TRAIN_CSV = os.environ.get("TRAIN_CSV")
 TEST_CSV = os.environ.get("TEST_CSV")
 TRAIN_HDF5 = os.environ.get("TRAIN_HDF5")
 TEST_HDF5 = os.environ.get("TEST_HDF5")
+PRETRAINED_MODEL = os.environ.get("PRETRAINED_MODEL")
 
 # Set up device and random seed
 
@@ -39,7 +39,6 @@ elif torch.cuda.is_available():
 else:
     device = torch.device("cpu")
 print(f"Using device: {device}")
-
 
 random_seed = 42
 random.seed(random_seed)
@@ -57,12 +56,10 @@ num_epochs = 1
 #train entire model vs. just the classifier
 freeze_base_model = False  #didn't get good results
 
-
 # if this is set to true - full model is only generated as part of scoring (quick_train_record_count used)
 # this saves GPU quota - but saved model won't reflect what was scored...
 full_train_only_when_scoring = False  #must be False to save full model!
-quick_train_record_count = 50000   #need to get at least some positive cases even for test run
-
+quick_train_record_count = 50000  #need to get at least some positive cases even for test run
 
 ## Load meta data and split folds
 
@@ -87,7 +84,6 @@ for fold, count in fold_summary.items():
         print(f"Fold {fold}: {count} patients")
 print(f"Total patients: {total_patients}")
 
-
 # are we scoring?
 scoring = False
 #check length of test data to see if we are scoring....
@@ -109,7 +105,8 @@ original_positive_ratio = original_positive_cases / original_total_cases
 
 print(f"Number of positive cases: {original_positive_cases}")
 print(f"Number of negative cases: {original_total_cases - original_positive_cases}")
-print(f"Ratio of negative to positive cases: {(original_total_cases - original_positive_cases) / original_positive_cases:.2f}:1")
+print(
+    f"Ratio of negative to positive cases: {(original_total_cases - original_positive_cases) / original_positive_cases:.2f}:1")
 
 ##Downsample Negatives / Keep All Positives
 ##Keeping just 1% of negatives!
@@ -136,11 +133,12 @@ print(f"Number of positive cases: {positive_cases}")
 print(f"Number of negative cases: {total_cases - positive_cases}")
 print(f"New ratio of negative to positive cases: {(total_cases - positive_cases) / positive_cases:.2f}:1")
 
+
 # ImageNet Setup for Training
 
 def setup_model(num_classes=2, freeze_base_model=freeze_base_model):
     model = timm.create_model('tf_efficientnetv2_b1',
-                              checkpoint_path='/kaggle/input/effnetv2-m-b1-pth/tf_efficientnetv2_b1-be6e41b0.pth',
+                              checkpoint_path=PRETRAINED_MODEL,
                               pretrained=False)
 
     if freeze_base_model:
@@ -149,6 +147,7 @@ def setup_model(num_classes=2, freeze_base_model=freeze_base_model):
 
     model.classifier = nn.Linear(model.classifier.in_features, out_features=num_classes)
     return model.to(device)
+
 
 def print_trainable_parameters(model):
     trainable_params = 0
@@ -160,6 +159,7 @@ def print_trainable_parameters(model):
     print(
         f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param:.2f}"
     )
+
 
 # Data Loading / Image Augmentation
 
@@ -191,6 +191,7 @@ class ISICDataset(Dataset):
 
         return img, target
 
+
 # Prepare augmentation
 aug_transform = A.Compose([
     A.RandomRotate90(),
@@ -206,6 +207,7 @@ base_transform = A.Compose([
     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ToTensorV2(),
 ])
+
 
 # Visualize image augmentation
 
@@ -262,8 +264,9 @@ def visualize_augmentations_positive(dataset, num_samples=3, num_augmentations=5
     plt.tight_layout()
     plt.show()
 
+
 augtest_dataset = ISICDataset(
-    hdf5_file= TRAIN_HDF5,
+    hdf5_file=TRAIN_HDF5,
     isic_ids=df_train['isic_id'].values,
     targets=df_train['target'].values,
     transform=aug_transform,
@@ -271,18 +274,18 @@ augtest_dataset = ISICDataset(
 
 visualize_augmentations_positive(augtest_dataset)
 
-def score(solution: pd.DataFrame, submission: pd.DataFrame, row_id_column_name: str, min_tpr: float=0.80) -> float:
 
+def score(solution: pd.DataFrame, submission: pd.DataFrame, row_id_column_name: str, min_tpr: float = 0.80) -> float:
     del solution[row_id_column_name]
     del submission[row_id_column_name]
 
     # rescale the target. set 0s to 1s and 1s to 0s (since sklearn only has max_fpr)
-    v_gt = abs(np.asarray(solution.values)-1)
+    v_gt = abs(np.asarray(solution.values) - 1)
 
     # flip the submissions to their compliments
-    v_pred = -1.0*np.asarray(submission.values)
+    v_pred = -1.0 * np.asarray(submission.values)
 
-    max_fpr = abs(1-min_tpr)
+    max_fpr = abs(1 - min_tpr)
 
     # using sklearn.metric functions: (1) roc_curve and (2) auc
     fpr, tpr, _ = roc_curve(v_gt, v_pred, sample_weight=None)
@@ -299,7 +302,8 @@ def score(solution: pd.DataFrame, submission: pd.DataFrame, row_id_column_name: 
     fpr = np.append(fpr[:stop], max_fpr)
     partial_auc = auc(fpr, tpr)
 
-    return(partial_auc)
+    return (partial_auc)
+
 
 # Train / CV
 
@@ -308,7 +312,7 @@ def train_evaluate(model, train_loader, val_loader, criterion, optimizer, schedu
 
     # Training phase
     model.train()
-    for inputs, targets in tqdm(train_loader, desc=f"Epoch {epoch+1}, Fold {fold+1} Training"):
+    for inputs, targets in tqdm(train_loader, desc=f"Epoch {epoch + 1}, Fold {fold + 1} Training"):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad(set_to_none=True)
 
@@ -324,7 +328,7 @@ def train_evaluate(model, train_loader, val_loader, criterion, optimizer, schedu
     model.eval()
     val_targets, val_outputs = [], []
     with torch.no_grad(), autocast():
-        for inputs, targets in tqdm(val_loader, desc=f"Epoch {epoch+1}, Fold {fold+1} Evaluating"):
+        for inputs, targets in tqdm(val_loader, desc=f"Epoch {epoch + 1}, Fold {fold + 1} Evaluating"):
             inputs, targets = inputs.to(device), targets.to(device)
             outputs = model(inputs)
             val_targets.append(targets.cpu())
@@ -350,7 +354,8 @@ def cross_validation_train(df_train, num_folds, num_epochs, hdf5_file_path, aug_
             val_df = df_train[df_train['fold'] == fold]
 
             # Create datasets and data loaders
-            train_dataset = ISICDataset(hdf5_file_path, train_df['isic_id'].values, train_df['target'].values, aug_transform)
+            train_dataset = ISICDataset(hdf5_file_path, train_df['isic_id'].values, train_df['target'].values,
+                                        aug_transform)
             val_dataset = ISICDataset(hdf5_file_path, val_df['isic_id'].values, val_df['target'].values, base_transform)
 
             train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4, pin_memory=True)
@@ -365,7 +370,8 @@ def cross_validation_train(df_train, num_folds, num_epochs, hdf5_file_path, aug_
                   f"Train Pos Ratio: {train_df['target'].mean():.2%}, Val Pos Ratio: {val_df['target'].mean():.2%}")
 
             # Train and evaluate
-            val_targets, val_outputs = train_evaluate(model, train_loader, val_loader, criterion, optimizer, scheduler, fold, epoch, device)
+            val_targets, val_outputs = train_evaluate(model, train_loader, val_loader, criterion, optimizer, scheduler,
+                                                      fold, epoch, device)
             epoch_val_targets.extend(val_targets)
             epoch_val_outputs.extend(val_outputs)
 
@@ -388,12 +394,14 @@ def cross_validation_train(df_train, num_folds, num_epochs, hdf5_file_path, aug_
 
     return np.array(all_val_targets), np.array(all_val_outputs)
 
+
 # Set up CUDA if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Perform cross-validation training
-all_val_targets, all_val_outputs = cross_validation_train(df_train_balanced, num_folds, num_epochs, TRAIN_HDF5, aug_transform, base_transform, device)
+all_val_targets, all_val_outputs = cross_validation_train(df_train_balanced, num_folds, num_epochs, TRAIN_HDF5,
+                                                          aug_transform, base_transform, device)
 
 #%%
 # Final overall evaluation
@@ -412,11 +420,13 @@ print("\nOverall Classification Report:")
 print(report)
 
 # Print specific metrics for Class 1
-report_dict = classification_report(all_val_targets, binary_predictions, target_names=['Class 0', 'Class 1'], output_dict=True)
+report_dict = classification_report(all_val_targets, binary_predictions, target_names=['Class 0', 'Class 1'],
+                                    output_dict=True)
 print(f"\nClass 1 Metrics:")
 print(f"Precision: {report_dict['Class 1']['precision']:.4f}")
 print(f"Recall: {report_dict['Class 1']['recall']:.4f}")
 print(f"F1-score: {report_dict['Class 1']['f1-score']:.4f}")
+
 
 # Inference Code
 
@@ -445,6 +455,7 @@ class ISICDataset(Dataset):
     def __del__(self):
         self.hdf5_file.close()  # Ensure file is closed when object is destroyed
 
+
 # Define the albumentations transformation
 base_transform = A.Compose([
     A.Resize(224, 224),
@@ -454,17 +465,22 @@ base_transform = A.Compose([
 
 epoch_for_preds = num_epochs
 model_path = ""
+
+
 def setup_model(num_classes=2):
     return timm.create_model('tf_efficientnetv2_b1', pretrained=False, num_classes=num_classes)
+
 
 def load_models(folds, device):
     models = []
     for fold in folds:
         model = setup_model().to(device)
-        model.load_state_dict(torch.load(f'{model_path}model_fold_{fold}_epoch_{epoch_for_preds}.pth', map_location=device))
+        model.load_state_dict(
+            torch.load(f'{model_path}model_fold_{fold}_epoch_{epoch_for_preds}.pth', map_location=device))
         model.eval()
         models.append(model)
     return models
+
 
 @torch.no_grad()  # Apply no_grad to the entire function
 def ensemble_predict(models, test_loader, device):
@@ -475,6 +491,7 @@ def ensemble_predict(models, test_loader, device):
         avg_predictions = fold_predictions.mean(dim=0)
         all_predictions.extend(avg_predictions.cpu().numpy())
     return all_predictions
+
 
 # Generate out-of-fold predictions for Train
 
