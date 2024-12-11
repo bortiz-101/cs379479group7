@@ -33,15 +33,12 @@ https://www.kaggle.com/competitions/isic-2024-challenge
 
       #### Linux/MacOS
       ```bash
-      cat << 'EOF' > environment.config
-      $DATA=<INSERT_DATA_PATH>
-      TRAIN_CSV=\${DATA}/isic-2024-challenge/train-metadata.csv
-      TEST_CSV=\${DATA}/isic-2024-challenge/test-metadata.csv
-      TRAIN_HDF5=\${DATA}/isic-2024-challenge/train-image.hdf5
-      TEST_HDF5=\${DATA}/isic-2024-challenge/test-image.hdf5
-      PRETRAINED_MODEL=\${DATA}/tf_efficientnetv2_b1-be6e41b0.pth
-      EOF
-      source environment.config
+    export DATA=/Users/bortiz/Desktop
+    export TRAIN_CSV=$DATA/isic-2024-challenge/train-metadata.csv
+    export TEST_CSV=$DATA/isic-2024-challenge/test-metadata.csv
+    export TRAIN_HDF5=$DATA/isic-2024-challenge/train-image.hdf5
+    export TEST_HDF5=$DATA/isic-2024-challenge/test-image.hdf5
+    export PRETRAINED_MODEL=$DATA/tf_efficientnetv2_b1-be6e41b0.pth
       ```
 
 
