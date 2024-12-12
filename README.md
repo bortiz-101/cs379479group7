@@ -3,8 +3,8 @@
 The project includes both python (.py) and python notebook (.ipynb) files. Additionally included is the training data. Please follow the directions below and set the needed environmental variables.
 
 ![Image](docs/header.png)
-
-https://www.kaggle.com/competitions/isic-2024-challenge
+* `Download`: Training set
+* https://www.kaggle.com/competitions/isic-2024-challenge
 * `train.py`: Script that trains and tests a simple model 
 * `isic-2024.ipynb`: Same as train.py, but in a Jupyter Notebook format
 ## Running `train.py`
@@ -18,12 +18,12 @@ https://www.kaggle.com/competitions/isic-2024-challenge
    ```
    #### Linux/MacOS
     ````bash
-   pip3 install -r requirments.txt
+   pip3 install -r requirements.txt
 
 3. Set enviromental variables (update Data Path)
       #### Windows (Powershell)
       ```bash
-      [Environment]::SetEnvironmentVariable('DATA', 'C:\temp', 'Process')
+      [Environment]::SetEnvironmentVariable('DATA', 'C:\put\data\path\here', 'Process')
       [Environment]::SetEnvironmentVariable('TRAIN_CSV', "$($env:DATA)\isic-2024-challenge\train-metadata.csv", 'Process')
       [Environment]::SetEnvironmentVariable('TEST_CSV', "$($env:DATA)\isic-2024-challenge\test-metadata.csv", 'Process')
       [Environment]::SetEnvironmentVariable('TRAIN_HDF5', "$($env:DATA)\isic-2024-challenge\train-image.hdf5", 'Process')
@@ -33,7 +33,7 @@ https://www.kaggle.com/competitions/isic-2024-challenge
 
       #### Linux/MacOS
       ```bash
-    export DATA=/Users/bortiz/Desktop
+    export DATA=/Users/bortiz/Desktop/cs379479group7
     export TRAIN_CSV=$DATA/isic-2024-challenge/train-metadata.csv
     export TEST_CSV=$DATA/isic-2024-challenge/test-metadata.csv
     export TRAIN_HDF5=$DATA/isic-2024-challenge/train-image.hdf5
@@ -46,9 +46,9 @@ https://www.kaggle.com/competitions/isic-2024-challenge
 
    #### Windows
    ```bash
-   python train.py
+   jupyter notebook
    ```
    #### Linux/MacOS
    ```bash
-   python3 train.py
+   jupyter notebook
    ```

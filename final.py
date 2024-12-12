@@ -1,8 +1,9 @@
 #%%
 # Train the ISIC 2024 Data
-* Idea is to show how this works 
-* This notebook will predicts on test using an average of all folds
+#* Idea is to show how this works
+#* This notebook will predicts on test using an average of all folds
 #%%
+import os
 import random
 import numpy as np
 import pandas as pd
@@ -13,9 +14,26 @@ from sklearn.preprocessing import binarize
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from sklearn.model_selection import GroupKFold
+import h5py
+import io
+from PIL import Image
+import torch.nn as nn
+from torch.utils.data import DataLoader
+import timm
+from tqdm import tqdm
 #%% md
 # # Setup
 #%%
+
+
+# Load environmental variables
+DATA = os.environ.get("DATA")
+TRAIN_CSV = os.environ.get("TRAIN_CSV")
+TEST_CSV = os.environ.get("TEST_CSV")
+TRAIN_HDF5 = os.environ.get("TRAIN_HDF5")
+TEST_HDF5 = os.environ.get("TEST_HDF5")
+PRETRAINED_MODEL = os.environ.get("PRETRAINED_MODEL")
+
 # Set up device and random seed
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
@@ -48,7 +66,7 @@ quick_train_record_count = 50000   #need to get at least some positive cases eve
 # # Load meta - and split folds
 # * Maintain consistency with tabular data in other notebooks
 #%%
-df_train = pd.read_csv("/kaggle/input/isic-2024-challenge/train-metadata.csv")
+df_train = pd.read_csv(TRAIN_CSV)
 
 num_folds = 5
 
@@ -71,12 +89,12 @@ print(f"Total patients: {total_patients}")
 # # Load meta data / review
 #%%
 # Set the HDF5 file path
-TRAIN_HDF5_FILE_PATH = '/kaggle/input/isic-2024-challenge/train-image.hdf5'
+TRAIN_HDF5_FILE_PATH = TRAIN_HDF5
 
 # are we scoring?
 scoring = False
 #check length of test data to see if we are scoring....
-test_length = len(pd.read_csv("/kaggle/input/isic-2024-challenge/test-metadata.csv"))
+test_length = len(pd.read_csv(TEST_CSV))
 if test_length > 3:
     scoring = True
 
@@ -125,7 +143,7 @@ print(f"New ratio of negative to positive cases: {(total_cases - positive_cases)
 #%%
 def setup_model(num_classes=2, freeze_base_model=freeze_base_model):
     model = timm.create_model('tf_efficientnetv2_b1', 
-                            checkpoint_path='/kaggle/input/effnetv2-m-b1-pth/tf_efficientnetv2_b1-be6e41b0.pth',
+                            checkpoint_path= PRETRAINED_MODEL,
                             pretrained=False)
 
     if freeze_base_model:
@@ -540,8 +558,8 @@ if not scoring:
 #%% md
 # # Predict for test
 #%%
-df_test = pd.read_csv("/kaggle/input/isic-2024-challenge/test-metadata.csv")
-TEST_HDF5_FILE_PATH = '/kaggle/input/isic-2024-challenge/test-image.hdf5'
+df_test = pd.read_csv(TEST_CSV)
+TEST_HDF5_FILE_PATH = TEST_HDF5
 
 # Set up CUDA if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -10,3 +10,6 @@ timm
 scikit-learn
 albumentations
 matplotlib
+h5py
+tqdm
+notebook
