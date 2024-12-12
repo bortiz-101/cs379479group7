@@ -1,6 +1,6 @@
 # Group 7 ISIC 2024 Skin Cancer Detection Model 
 
-The project includes both python (.py) and python notebook (.ipynb) files. Additionally included is the training data. Please follow the directions below and set the needed environmental variables.
+The project includes both python (.py) and python notebook (.ipynb) files. Additionally be sure to download the training data. Please follow the directions below and set the needed environmental variables.
 
 ![Image](docs/header.png)
 * `Download`: Training set
@@ -18,12 +18,12 @@ The project includes both python (.py) and python notebook (.ipynb) files. Addit
    ```
    #### Linux/MacOS
     ````bash
-   pip3 install -r requirements.txt
+   pip install -r requirements.txt
 
 3. Set enviromental variables (update Data Path)
       #### Windows (Powershell)
       ```bash
-      [Environment]::SetEnvironmentVariable('DATA', 'C:\put\data\path\here', 'Process')
+      [Environment]::SetEnvironmentVariable('DATA', 'C:\temp', 'Process')
       [Environment]::SetEnvironmentVariable('TRAIN_CSV', "$($env:DATA)\isic-2024-challenge\train-metadata.csv", 'Process')
       [Environment]::SetEnvironmentVariable('TEST_CSV', "$($env:DATA)\isic-2024-challenge\test-metadata.csv", 'Process')
       [Environment]::SetEnvironmentVariable('TRAIN_HDF5', "$($env:DATA)\isic-2024-challenge\train-image.hdf5", 'Process')
@@ -33,7 +33,7 @@ The project includes both python (.py) and python notebook (.ipynb) files. Addit
 
       #### Linux/MacOS
       ```bash
-    export DATA=/Users/bortiz/Desktop/cs379479group7
+    export DATA=/mnt/c/temp
     export TRAIN_CSV=$DATA/isic-2024-challenge/train-metadata.csv
     export TEST_CSV=$DATA/isic-2024-challenge/test-metadata.csv
     export TRAIN_HDF5=$DATA/isic-2024-challenge/train-image.hdf5
@@ -52,3 +52,5 @@ The project includes both python (.py) and python notebook (.ipynb) files. Addit
    ```bash
    jupyter notebook
    ```
+   
+4. Run the isic-2024_Project.ipynb jupyter notebook in the jupyter server
